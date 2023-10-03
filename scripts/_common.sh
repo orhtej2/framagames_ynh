@@ -4,10 +4,10 @@
 # COMMON VARIABLES
 #=================================================
 
-YNH_PHP_VERSION="7.3"
+YNH_PHP_VERSION="8.2"
 
 # dependencies used by the app
-pkg_dependencies=""
+pkg_dependencies="php8.2-common"
 
 #=================================================
 # PERSONAL HELPERS
