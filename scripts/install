@@ -10,23 +10,64 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..."
+
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
+
+#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Setting up source files..."
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$install_dir"
+ynh_setup_source --dest_dir="$install_dir/build"
 
+chmod 750 "$install_dir"
 chmod -R o-rwx "$install_dir"
 chown -R $app:www-data "$install_dir"
 
-#=================================================
-# PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Configuring PHP-FPM..."
+ynh_script_progression --message="Building...." --weight=5
 
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_use_nodejs
+
+stripped_path=$(echo $path_url | sed -e 's/\///')
+
+pushd "$install_dir/build"
+  	ynh_replace_string --match_string="framanav: true" --replace_string="framanav: false" --target_file="src/data/main.yml"
+	ynh_replace_string --match_string="defaultLang: fr" --replace_string="defaultLang: $language" --target_file="src/data/main.yml"
+	
+	ynh_exec_warn_less ynh_exec_as $app $ynh_node_load_PATH NODE_OPTIONS="--openssl-legacy-provider" $ynh_npm run commons
+	if [ $path_url == "/" ]; then
+		ynh_replace_string --match_string="canonical: https://framagames.org" --replace_string="canonical: https://$domain" --target_file="src/data/main.yml"
+		ynh_exec_warn_less ynh_exec_as $app $ynh_node_load_PATH NODE_ENV=production NODE_OPTIONS="--openssl-legacy-provider" $ynh_npm run prod
+	else
+		ynh_exec_warn_less ynh_exec_as $app $ynh_node_load_PATH NODE_ENV=production CI_JOB_NAME=pages CI_PAGES_URL="https://$domain$path_url" NODE_OPTIONS="--openssl-legacy-provider" $ynh_npm run prod
+	fi
+
+	ynh_secure_remove --file="$install_dir/build/public"
+	mv dist/ public/
+
+	if [ $path_url == "/" ]; then
+		cp ./public/$language/index.html ./public/index.html
+		mv -f games/* public/
+	else
+		cp ./public/$stripped_path/$language/index.html ./public/$stripped_path/index.html
+		mv -f games/* public/$stripped_path
+	fi
+	cd public && for f in $(find -type l);do cp --remove-destination $(readlink -f $f) $f;done;
+
+popd
+
+if [ $path_url == "/" ]; then
+	mv "$install_dir/build/public" "$install_dir/public" 
+else
+	mv "$install_dir/build/public/$stripped_path" "$install_dir/public" 
+fi
+
+ynh_secure_remove --file="$install_dir/build"
+
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config

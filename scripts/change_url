@@ -21,3 +21,4 @@ ynh_change_url_nginx_config
 #=================================================
 
 ynh_script_progression --message="Change of URL completed for $app"
+

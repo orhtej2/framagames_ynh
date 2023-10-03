@@ -5,14 +5,14 @@ name = "Framagames"
 description.en = "Set of games Framagames from Framasoft"
 description.fr = "Ensemble de jeux Framagames venant de Framasoft"
 
-version = "1.0~ynh4"
+version = "2022.12.28~ynh1"
 
 maintainers = []
 
 [upstream]
 license = "AGPL-3.0-only"
-website = "https://framagit.org/framasoft/framagames"
 code = "https://framagit.org/framasoft/framagames"
+website = "https://framagames.org/en/"
 
 [integration]
 yunohost = ">= 11.2"
@@ -32,16 +32,26 @@ ram.runtime = "50M"
     type = "path"
     default = "/framagames"
 
+    [install.language]
+    ask.en = "Choose the application language"
+    ask.fr = "Choisissez la langue de l'application"
+    type = "select"
+    choices = ["fr", "en"]
+    default = "en"
+
     [install.init_main_permission]
+    help.en = "If enabled, Framagames will be accessible by people who doesn’t have an account. This can be changed later via the webadmin."
+    help.fr = "Si cette case est cochée, Framagames sera accessible aux personnes n’ayant pas de compte. Vous pourrez changer ceci plus tard via la webadmin."
     type = "group"
     default = "visitors"
 
 [resources]
 
-        [resources.sources.main]
+    [resources.sources]
 
-        url = "https://framagit.org/framasoft/framagames/-/archive/6808f75cd18f4a1bb0345ce65d055e2dfef8c0b7/framagames-6808f75cd18f4a1bb0345ce65d055e2dfef8c0b7.tar.gz"
-        sha256 = "6c2bf60663dad46ac6660ddb3634d1c05dcf38cea1f2687b8ee26743deb8a10e"
+        [resources.sources.main]
+        url = "https://framagit.org/framasoft/framagames/-/archive/5510754d92e9649aa1808ffb1d3255d5da1ebf47/framagames-5510754d92e9649aa1808ffb1d3255d5da1ebf47.tar.gz"
+        sha256 = "d1b772cbda377ee2fdecf468eb251fb0d05b865d1b39703790a86943a1731973"
 
     [resources.system_user]
 
@@ -49,6 +59,3 @@ ram.runtime = "50M"
 
     [resources.permissions]
     main.url = "/"
-
-    [resources.apt]
-    packages = "php8.2-fpm"

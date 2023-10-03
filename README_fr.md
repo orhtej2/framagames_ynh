@@ -18,7 +18,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 
 Set of games Framagames from Framasoft.
 
-**Version incluse :** 1.0~ynh4
+**Version incluse :** 2022.12.28~ynh1
 ## Documentations et ressources
 
 * Site officiel de l’app : <https://framagit.org/framasoft/framagames>
