@@ -49,6 +49,13 @@ then
 		# Set permissions on app files
 		chown $app:www-data $install_dir
 		chmod o-rwx $install_dir
+
+		ynh_script_progression --message="Removing PHP config..." --weight=1
+		if [ -z "${phpversion:-}" ]; then
+			phpversion="7.3"
+		fi
+		
+		ynh_remove_fpm_config
 	fi
 	ynh_script_progression --message="Setting up source files..."
 
